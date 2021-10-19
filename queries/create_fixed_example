@@ -1,0 +1,30 @@
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix mosp: <http://dfki.de/examples/stig_mosp#>
+prefix ord: <http://dfki.de/examples/stig_mosp/orders#>
+prefix st: <http://dfki.de/stigld/>
+prefix schema: <http://schema.org/>
+
+
+INSERT {
+  mosp:order_1 a schema:Order , st:Topos ; schema:orderedItem mosp:RedBox, mosp:PurpleBox .
+  mosp:order_2 a schema:Order , st:Topos ; schema:orderedItem mosp:YellowBox, mosp:BlueBox, mosp:GreenBox .
+  mosp:order_3 a schema:Order , st:Topos ; schema:orderedItem mosp:BlueBox, mosp:PurpleBox .
+  mosp:order_4 a schema:Order , st:Topos ; schema:orderedItem mosp:YellowBox, mosp:GreenBox .
+  mosp:order_5 a schema:Order , st:Topos ; schema:orderedItem mosp:RedBox, mosp:WhiteBox .
+  mosp:order_6 a schema:Order , st:Topos ; schema:orderedItem mosp:RedBox, mosp:BlueBox, mosp:PurpleBox , mosp:BlackBox .
+  mosp:order_7 a schema:Order , st:Topos ; schema:orderedItem mosp:YellowBox, mosp:GreenBox .
+}
+WHERE {
+  ?s ?p ?o
+} ;
+
+## Establish adjacent links and backlinks to and from existing orders
+INSERT {
+  ?this st:adjacentTo ?that .
+  ?that st:adjacentTo ?this .
+}
+WHERE {
+  ?this a schema:Order ; schema:orderedItem ?item .
+  ?that a schema:Order ; schema:orderedItem ?item .
+  FILTER(?this != ?that)
+}

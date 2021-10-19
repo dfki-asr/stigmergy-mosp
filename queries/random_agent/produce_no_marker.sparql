@@ -1,0 +1,51 @@
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix mosp: <http://dfki.de/examples/stig_mosp#>
+prefix ord: <http://dfki.de/examples/stig_mosp/orders#>
+prefix st: <http://dfki.de/stigld/>
+prefix schema: <http://schema.org/>
+
+DELETE {
+  ?lastElement rdf:rest rdf:nil .
+  ?emptyList rdf:contents rdf:nil .
+}
+INSERT {
+
+  ### Log produced product in order sequence
+  ?sequenceElement rdf:first ?producedClass ;
+                   rdf:rest rdf:nil .
+  ?lastElement rdf:rest ?sequenceElement .
+  ?emptyList rdf:contents ?sequenceElement .
+
+  ### Add Item to the stack
+  ?stack a mosp:Stack ; mosp:forOrder ?order ; schema:orderedItem ?item .
+  ?item a ?producedClass .
+
+}  WHERE {
+
+  OPTIONAL { ?emptyList rdf:contents rdf:nil . }
+  OPTIONAL { ?lastElement rdf:rest rdf:nil . }
+
+  BIND(BNODE() as ?sequenceElement)
+
+  ## Agent picks an item out of the order list at random
+  {SELECT ?producedClass ?at WHERE {
+    mosp:Agent st:locatedAt ?at .
+    ?at schema:orderedItem ?producedClass .
+    FILTER NOT EXISTS { ?stack a mosp:Stack ; schema:orderedItem [ a ?producedClass ]. }
+  } ORDER BY RAND() LIMIT 1}
+
+  ## Find all orders that require the selected product
+  {SELECT DISTINCT (BNODE() as ?marker) ?order ?producedClass WHERE {
+    ?order schema:orderedItem ?producedClass .
+  }}
+
+  ## Add the newly produced product to a stack; create new stack where necessary
+  {SELECT (BNODE() as ?item) (UUID() as ?stack) ?order ?producedClass WHERE {
+    ?order schema:orderedItem ?producedClass .
+    FILTER NOT EXISTS { ?stack a mosp:Stack ; mosp:forOrder ?order }
+  }
+  } UNION
+  {SELECT (BNODE() as ?item) ?stack ?order WHERE {
+    ?stack a mosp:Stack ; mosp:forOrder ?order .
+  }}
+}

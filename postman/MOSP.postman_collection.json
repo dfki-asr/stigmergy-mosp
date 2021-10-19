@@ -1,0 +1,723 @@
+{
+	"info": {
+		"_postman_id": "79036b55-f645-41ee-82c3-d1f0b51b778a",
+		"name": "MOSP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Initialization",
+			"item": [
+				{
+					"name": "Reset with 7 classes",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/sparql-update",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix schema: <http://schema.org/>\r\nprefix xsd: <http://www.w3.org/2001/XMLSchema#>\r\n\r\nDELETE {\r\n    ?s ?p ?o\r\n}\r\nINSERT {\r\n    mosp:RedBox a schema:Product .\r\n    mosp:YellowBox a schema:Product .\r\n    mosp:BlueBox a schema:Product .\r\n    mosp:GreenBox a schema:Product .\r\n    mosp:PurpleBox a schema:Product .\r\n    mosp:BlackBox a schema:Product .\r\n    mosp:WhiteBox a schema:Product .\r\n\r\n    mosp:orderSequence rdf:contents rdf:nil .\r\n    mosp:maxStackCount rdf:value \"0\"^^xsd:int .\r\n}\r\nWHERE { ?s ?p ?o }"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Resets the scenario and deletes everything but the class definitions of the producst"
+					},
+					"response": []
+				},
+				{
+					"name": "Reset with 10 classes",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/sparql-update",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix schema: <http://schema.org/>\r\nprefix xsd: <http://www.w3.org/2001/XMLSchema#>\r\n\r\nDELETE {\r\n    ?s ?p ?o\r\n}\r\nINSERT {\r\nmosp:RedBox  a  schema:Product .\r\n\r\nmosp:YellowBox  a  schema:Product .\r\n\r\nmosp:BlueBox  a  schema:Product .\r\n\r\nmosp:GreenBox  a  schema:Product .\r\n\r\nmosp:PurpleBox  a  schema:Product .\r\n\r\nmosp:BlackBox  a  schema:Product .\r\n\r\nmosp:WhiteBox  a  schema:Product .\r\n\r\nmosp:OrangeBox  a  schema:Product .\r\n\r\nmosp:GreyBox  a  schema:Product .\r\n\r\nmosp:TurquoiseBox  a  schema:Product .\r\n\r\n    mosp:orderSequence rdf:contents rdf:nil .\r\n    mosp:maxStackCount rdf:value \"0\"^^xsd:int .\r\n}\r\nWHERE { ?s ?p ?o }"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Resets the scenario and deletes everything but the class definitions of the producst"
+					},
+					"response": []
+				},
+				{
+					"name": "Insert Random Order",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/sparql-update",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n## Create a random order with configurable number of different ordered products\r\n## (Adapt LIMIT parameter to set order batch size)\r\nINSERT {\r\n  ?orderId a schema:Order , st:Topos ; schema:orderedItem ?orderedBox .\r\n}\r\nWHERE {\r\n  {SELECT ?orderId ?orderedBox WHERE {\r\n    ?orderedBox a schema:Product .\r\n    {SELECT (UUID() as ?orderId) WHERE {}}\r\n  } ORDER BY RAND() LIMIT 3 }\r\n} ;\r\n\r\n## Establish adjacent links and backlinks to and from existing orders\r\nINSERT {\r\n  ?this st:adjacentTo ?that .\r\n  ?that st:adjacentTo ?this .\r\n}\r\nWHERE {\r\n  ?this a schema:Order ; schema:orderedItem ?item .\r\n  ?that a schema:Order ; schema:orderedItem ?item .\r\n  FILTER(?this != ?that)\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Inserts a random order to the environment. The number of different products can be configured by changing the LIMIT parameter."
+					},
+					"response": []
+				},
+				{
+					"name": "Insert Fixed Orders",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/sparql-update"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n\r\nINSERT {\r\n  mosp:order_1 a schema:Order , st:Topos ; schema:orderedItem mosp:RedBox, mosp:PurpleBox .\r\n  mosp:order_2 a schema:Order , st:Topos ; schema:orderedItem mosp:YellowBox, mosp:BlueBox, mosp:GreenBox .\r\n  mosp:order_3 a schema:Order , st:Topos ; schema:orderedItem mosp:BlueBox, mosp:PurpleBox .\r\n  mosp:order_4 a schema:Order , st:Topos ; schema:orderedItem mosp:YellowBox, mosp:GreenBox .\r\n  mosp:order_5 a schema:Order , st:Topos ; schema:orderedItem mosp:RedBox, mosp:WhiteBox .\r\n  mosp:order_6 a schema:Order , st:Topos ; schema:orderedItem mosp:RedBox, mosp:BlueBox, mosp:PurpleBox , mosp:BlackBox .\r\n  mosp:order_7 a schema:Order , st:Topos ; schema:orderedItem mosp:YellowBox, mosp:GreenBox .\r\n}\r\nWHERE {\r\n  ?s ?p ?o\r\n} ;\r\n\r\n## Establish adjacent links and backlinks to and from existing orders\r\nINSERT {\r\n  ?this st:adjacentTo ?that .\r\n  ?that st:adjacentTo ?this .\r\n}\r\nWHERE {\r\n  ?this a schema:Order ; schema:orderedItem ?item .\r\n  ?that a schema:Order ; schema:orderedItem ?item .\r\n  FILTER(?this != ?that)\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Inserts a random order to the environment. The number of different products can be configured by changing the LIMIT parameter."
+					},
+					"response": []
+				},
+				{
+					"name": "Insert 7 6",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/sparql-update"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n\r\nINSERT {\r\n<urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:PurpleBox , mosp:BlackBox .\r\n\r\n<urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> ;\r\n        schema:orderedItem  mosp:BlackBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:BlueBox , mosp:PurpleBox .\r\n\r\n<urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:BlueBox , mosp:PurpleBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:PurpleBox , mosp:BlackBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:GreenBox , mosp:PurpleBox .\r\n}\r\nWHERE {\r\n  ?s ?p ?o\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Inserts a random order to the environment. The number of different products can be configured by changing the LIMIT parameter."
+					},
+					"response": []
+				},
+				{
+					"name": "Insert 7 10",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/sparql-update"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n\r\nINSERT {\r\n  mosp:RedBox  a  schema:Product .\r\n\r\nmosp:YellowBox  a  schema:Product .\r\n\r\nmosp:BlueBox  a  schema:Product .\r\n\r\nmosp:GreenBox  a  schema:Product .\r\n\r\nmosp:PurpleBox  a  schema:Product .\r\n\r\nmosp:BlackBox  a  schema:Product .\r\n\r\nmosp:WhiteBox  a  schema:Product .\r\n\r\nmosp:orderSequence  rdf:contents  () .\r\n\r\nmosp:maxStackCount  rdf:value  0 .\r\n\r\n<urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:PurpleBox , mosp:BlackBox .\r\n\r\n<urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> ;\r\n        schema:orderedItem  mosp:BlackBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:BlueBox , mosp:PurpleBox .\r\n\r\n<urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:BlueBox , mosp:PurpleBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:BlueBox , mosp:GreenBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:PurpleBox , mosp:BlackBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:71d35abd-ea87-49d0-8665-04966403e398>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:BlueBox , mosp:BlackBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:BlueBox , mosp:GreenBox , mosp:BlackBox .\r\n\r\n<urn:uuid:87da72de-67cb-4244-8599-80f34690de82>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:GreenBox .\r\n\r\n<urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:GreenBox , mosp:PurpleBox .\r\n\r\n}\r\nWHERE {\r\n  ?s ?p ?o\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Inserts a random order to the environment. The number of different products can be configured by changing the LIMIT parameter."
+					},
+					"response": []
+				},
+				{
+					"name": "Insert 7 20",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/sparql-update"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n\r\nINSERT {\r\n\r\n<urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:PurpleBox , mosp:BlackBox .\r\n\r\n<urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:BlackBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:BlueBox , mosp:PurpleBox .\r\n\r\n<urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:BlueBox , mosp:PurpleBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:BlueBox , mosp:GreenBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:PurpleBox , mosp:BlackBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:71d35abd-ea87-49d0-8665-04966403e398>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:BlueBox , mosp:BlackBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:BlueBox , mosp:GreenBox , mosp:BlackBox .\r\n\r\n<urn:uuid:87da72de-67cb-4244-8599-80f34690de82>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:GreenBox .\r\n\r\n<urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:GreenBox , mosp:PurpleBox .\r\n\r\n<urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:GreenBox , mosp:BlackBox .\r\n\r\n<urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:GreenBox .\r\n\r\n<urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:PurpleBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:BlueBox , mosp:GreenBox .\r\n\r\n<urn:uuid:8e7d714e-cf96-449a-894a-d57320659502>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:BlueBox , mosp:BlackBox .\r\n\r\n<urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:BlueBox , mosp:GreenBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:GreenBox .\r\n\r\n<urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:PurpleBox .\r\n\r\n<urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:GreenBox , mosp:PurpleBox .\r\n\r\n<urn:uuid:07ca2c6a-2d3a-4129-b2f8-ca2d07a71308>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:93d75773-575d-42f9-b0db-4780b606fb5f> , <urn:uuid:09ee98d2-107a-4603-808d-f3d93e269a78> , <urn:uuid:01d3bde5-804f-480d-a185-9612f57212c8> , <urn:uuid:ec007f7b-20b7-42dd-b4fd-7cddf5324a89> , <urn:uuid:dfa020ec-652b-4273-a572-13aee51931d4> , <urn:uuid:17676735-62b4-4a36-bc1a-0a847e669250> , <urn:uuid:71d35abd-ea87-49d0-8665-04966403e398> , <urn:uuid:d526623f-d2aa-4b31-8ac4-d3c05c285c20> , <urn:uuid:87da72de-67cb-4244-8599-80f34690de82> , <urn:uuid:1e6ed88c-a38e-4d68-b568-b24ba226ac52> , <urn:uuid:73ed00aa-f120-4b2a-ad34-f0afac5bf673> , <urn:uuid:293b74f1-1ac6-45b1-932c-8a886f24cb53> , <urn:uuid:77a90f7a-cc2f-4141-8f53-9c6b9fdb7974> , <urn:uuid:7a8ec969-5b9e-4db0-9800-99c0a0621f9b> , <urn:uuid:8e7d714e-cf96-449a-894a-d57320659502> , <urn:uuid:e0bbc613-ce75-4b02-bcd9-645a520e1274> , <urn:uuid:ec339c00-a1c3-487d-93ec-655829ae5c63> , <urn:uuid:5a9ccaac-e925-4f18-a936-8648baaf45df> , <urn:uuid:abe86952-6c1b-4bc9-96ba-59e4e0125afa> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:BlueBox , mosp:GreenBox , mosp:PurpleBox , mosp:WhiteBox .\r\n}\r\nWHERE {\r\n  ?s ?p ?o\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Inserts a random order to the environment. The number of different products can be configured by changing the LIMIT parameter."
+					},
+					"response": []
+				},
+				{
+					"name": "Insert 10 6",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/sparql-update"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n\r\nINSERT {  \r\n\r\n<urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> ;\r\n        schema:orderedItem  mosp:WhiteBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> ;\r\n        schema:orderedItem  mosp:OrangeBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> ;\r\n        schema:orderedItem  mosp:BlueBox , mosp:WhiteBox , mosp:OrangeBox .\r\n\r\n<urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:BlueBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:PurpleBox .\r\n\r\n<urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:GreenBox , mosp:PurpleBox , mosp:OrangeBox , mosp:GreyBox .\r\n\r\n}\r\nWHERE {\r\n  ?s ?p ?o\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Inserts a random order to the environment. The number of different products can be configured by changing the LIMIT parameter."
+					},
+					"response": []
+				},
+				{
+					"name": "Insert 10 10",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/sparql-update"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n\r\nINSERT {  \r\n\r\n<urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> ;\r\n        schema:orderedItem  mosp:WhiteBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> ;\r\n        schema:orderedItem  mosp:OrangeBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> ;\r\n        schema:orderedItem  mosp:BlueBox , mosp:WhiteBox , mosp:OrangeBox .\r\n\r\n<urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:BlueBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:PurpleBox .\r\n\r\n<urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:GreenBox , mosp:PurpleBox , mosp:OrangeBox , mosp:GreyBox .\r\n\r\n<urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:BlackBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:GreyBox .\r\n\r\n<urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:OrangeBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:GreenBox , mosp:BlackBox , mosp:GreyBox .\r\n\r\n}\r\nWHERE {\r\n  ?s ?p ?o\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Inserts a random order to the environment. The number of different products can be configured by changing the LIMIT parameter."
+					},
+					"response": []
+				},
+				{
+					"name": "Insert 10 20",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/sparql-update"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n\r\nINSERT {  \r\n\r\n<urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:WhiteBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:OrangeBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> ;\r\n        schema:orderedItem  mosp:BlueBox , mosp:WhiteBox , mosp:OrangeBox .\r\n\r\n<urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:BlueBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:546f6b6b-165f-4ffc-a1a6-24d3cea4d699> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:PurpleBox .\r\n\r\n<urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:546f6b6b-165f-4ffc-a1a6-24d3cea4d699> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:GreenBox , mosp:PurpleBox , mosp:OrangeBox , mosp:GreyBox .\r\n\r\n<urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:BlackBox , mosp:WhiteBox .\r\n\r\n<urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:546f6b6b-165f-4ffc-a1a6-24d3cea4d699> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:BlueBox , mosp:GreyBox .\r\n\r\n<urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:YellowBox , mosp:OrangeBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:6ff88905-5ef8-4b8e-a4de-ac0b4049ff89> , <urn:uuid:546f6b6b-165f-4ffc-a1a6-24d3cea4d699> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:GreenBox , mosp:BlackBox , mosp:GreyBox .\r\n\r\n<urn:uuid:546f6b6b-165f-4ffc-a1a6-24d3cea4d699>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:PurpleBox , mosp:GreyBox .\r\n\r\n<urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:OrangeBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:WhiteBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:BlackBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:546f6b6b-165f-4ffc-a1a6-24d3cea4d699> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:BlueBox , mosp:PurpleBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:GreenBox , mosp:BlackBox , mosp:WhiteBox , mosp:OrangeBox .\r\n\r\n<urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:546f6b6b-165f-4ffc-a1a6-24d3cea4d699> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:RedBox , mosp:PurpleBox , mosp:BlackBox , mosp:TurquoiseBox .\r\n\r\n<urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:546f6b6b-165f-4ffc-a1a6-24d3cea4d699> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:BlueBox , mosp:GreenBox , mosp:PurpleBox .\r\n\r\n<urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:98814131-bc35-4b54-97f2-11885f9e0f32> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:546f6b6b-165f-4ffc-a1a6-24d3cea4d699> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301> ;\r\n        schema:orderedItem  mosp:YellowBox , mosp:GreenBox , mosp:PurpleBox , mosp:OrangeBox , mosp:GreyBox .\r\n\r\n<urn:uuid:a0d17c4e-6960-46bd-a305-6c519b2aa301>\r\n        a                   schema:Order , st:Topos ;\r\n        st:adjacentTo       <urn:uuid:29ca036d-15f9-45f0-80d5-7e10d63458ef> , <urn:uuid:3b07ca89-3c81-4969-a03a-827b6225f11e> , <urn:uuid:4bed3884-4ca4-4467-8878-49e878ab7eca> , <urn:uuid:c0046e8d-1867-4d46-9b90-7294bd398662> , <urn:uuid:dc9cdae2-eda5-4966-bbb1-5738d1425b7b> , <urn:uuid:6ad7cc56-3ab9-4872-97e7-9063f94252b2> , <urn:uuid:cb6a869c-ab96-4c02-974b-b240736de443> , <urn:uuid:7209592b-ed41-4920-a9b8-109cddd7e4b9> , <urn:uuid:959ff67f-5b49-4211-9b00-299cf5b13bee> , <urn:uuid:546f6b6b-165f-4ffc-a1a6-24d3cea4d699> , <urn:uuid:25b551c6-df2a-4682-b9b9-cb90ac236920> , <urn:uuid:e6ad2e48-bf2b-4466-bd1c-a9fbf74d22dd> , <urn:uuid:d9f36d0c-c3ed-4b6f-aad0-c256b4a184ad> , <urn:uuid:c6623979-bef1-46bd-99f2-4dc3a798bf52> , <urn:uuid:f4d0d62f-eb04-4bea-bd89-d0cd2b9602e5> , <urn:uuid:3c912642-c46c-4144-9490-d5ddbef4c225> , <urn:uuid:3258f167-79a7-4a08-a2f1-9b6cf2da9f89> , <urn:uuid:d96c9430-b77d-4f23-8497-bf128c6e4ac1> ;\r\n        schema:orderedItem  mosp:GreenBox , mosp:PurpleBox , mosp:BlackBox , mosp:GreyBox , mosp:TurquoiseBox .\r\n\r\n}\r\nWHERE {\r\n  ?s ?p ?o\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Inserts a random order to the environment. The number of different products can be configured by changing the LIMIT parameter."
+					},
+					"response": []
+				},
+				{
+					"name": "Count orders with item size",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/sparql-query",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\nSELECT * WHERE {\r\n    SELECT DISTINCT (count(?order) as ?count ) WHERE {\r\n        ?order a schema:Order        \r\n        FILTER(?c = 1)\r\n        {SELECT(count(?product) as ?c) ?order WHERE {\r\n            ?order schema:orderedItem ?product .\r\n        } GROUP BY ?order }\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/query",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"query"
+							]
+						},
+						"description": "Helper to count how many orders of a item size were created ; debug for benchmark scenario creation"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Simple Markers",
+			"item": [
+				{
+					"name": "Move agent to order",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/sparql-update",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n## If located at a Topos, agent will move to a neighbour order with highest concentration\r\n## of pheromones\r\n\r\nDELETE {\r\n  mosp:Agent st:locatedAt ?from\r\n}\r\nINSERT {\r\n  mosp:Agent st:locatedAt ?to\r\n}\r\nWHERE {\r\nmosp:Agent st:locatedAt ?from .\r\n{SELECT DISTINCT  ?to WHERE {\r\n\r\n  {SELECT DISTINCT ?to ?count WHERE {\r\n    mosp:Agent st:locatedAt ?from .\r\n    ?from st:adjacentTo ?to .\r\n    {SELECT DISTINCT ?to (COUNT(?marker) as ?count) WHERE {\r\n        ?to st:carries ?marker . ?marker a st:Trace  .\r\n    } GROUP BY ?to }}}\r\n\r\n  {SELECT (max(?count) as ?max) WHERE {\r\n   {SELECT DISTINCT ?to (COUNT(?marker) as ?count) WHERE {\r\n        mosp:Agent st:locatedAt ?from .\r\n        ?from st:adjacentTo ?to .\r\n        ?to st:carries ?marker . ?marker a st:Trace  .\r\n    } GROUP BY ?to }}}\r\n\r\n  FILTER(?count = ?max)\r\n    } ORDER BY RAND() LIMIT 1}} ;\r\n\r\n\r\n## Send agent to random order if not yet present anywhere\r\n\r\nINSERT {\r\n   mosp:Agent st:locatedAt ?randomOrder\r\n}\r\nWHERE {\r\n   {SELECT ?randomOrder WHERE  {\r\n    {SELECT (count(?item) as ?total) ?randomOrder WHERE {\r\n      ?randomOrder a schema:Order ; schema:orderedItem ?item .\r\n    } GROUP BY ?randomOrder }\r\n\r\n    {SELECT (min(?total) as ?min) WHERE {\r\n    {SELECT (count(?item) as ?total) ?randomOrder WHERE {\r\n      ?randomOrder a schema:Order ; schema:orderedItem ?item .\r\n    } GROUP BY ?randomOrder }}}\r\n    FILTER(?min = ?total)\r\n   } ORDER BY RAND() LIMIT 1}\r\n    FILTER NOT EXISTS { mosp:Agent st:locatedAt ?anywhere }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Moves the agent to an order. The first move is done random. After this, move will prefer orders with shared products and open stacks"
+					},
+					"response": []
+				},
+				{
+					"name": "Produce",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/sparql-update",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\nDELETE {\r\n  ?lastElement rdf:rest rdf:nil .\r\n  ?emptyList rdf:contents rdf:nil .\r\n}\r\nINSERT {\r\n\r\n  ### Log produced product in order sequence\r\n  ?sequenceElement rdf:first ?producedClass ;\r\n                   rdf:rest rdf:nil .\r\n  ?lastElement rdf:rest ?sequenceElement .\r\n  ?emptyList rdf:contents ?sequenceElement .\r\n\r\n  ### Add Item to the stack\r\n  ?stack a mosp:Stack ; mosp:forOrder ?order ; schema:orderedItem ?item .\r\n  ?item a ?producedClass .\r\n\r\n  ## Add a pheromone marker to the order\r\n  ?marker a st:Trace .\r\n  ?order st:carries ?marker .\r\n}  WHERE {\r\n\r\n  OPTIONAL { ?emptyList rdf:contents rdf:nil . }\r\n  OPTIONAL { ?lastElement rdf:rest rdf:nil . }\r\n\r\n  BIND(BNODE() as ?sequenceElement)\r\n\r\n  ## Agent picks an item out of the order list at random\r\n  {SELECT ?producedClass ?at WHERE {\r\n    mosp:Agent st:locatedAt ?at .\r\n    ?at schema:orderedItem ?producedClass .\r\n    FILTER NOT EXISTS { ?stack a mosp:Stack ; schema:orderedItem [ a ?producedClass ]. }\r\n  } ORDER BY RAND() LIMIT 1}\r\n\r\n  ## Find all orders that require the selected product\r\n  {SELECT DISTINCT (BNODE() as ?marker) ?order ?producedClass WHERE {\r\n    ?order schema:orderedItem ?producedClass .\r\n  }}\r\n\r\n  ## Add the newly produced product to a stack; create new stack where necessary\r\n  {SELECT (BNODE() as ?item) (UUID() as ?stack) ?order ?producedClass WHERE {\r\n    ?order schema:orderedItem ?producedClass .\r\n    FILTER NOT EXISTS { ?stack a mosp:Stack ; mosp:forOrder ?order }\r\n  }\r\n  } UNION\r\n  {SELECT (BNODE() as ?item) ?stack ?order WHERE {\r\n    ?stack a mosp:Stack ; mosp:forOrder ?order .\r\n  }}\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Selects a Random product from within the order that was not yet produced, and adds it to the stack of any order that requires that product. Puts a trace on any order that was served this way to attract the agent to open orders in the next steps"
+					},
+					"response": []
+				},
+				{
+					"name": "Close Orders",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/sparql-update",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "PREFIX sc: <http://purl.org/science/owl/sciencecommons/>\r\nprefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n\r\n#### DELETE ADJACENT RELATIONS\r\nDELETE {\r\n  ?other st:adjacentTo ?finishedOrder .\r\n  ?finishedOrder st:adjacentTo ?other .\r\n}\r\nWHERE {\r\n  ?finishedOrder a st:Topos , schema:Order ; st:adjacentTo ?other .\r\n  ?other a st:Topos, schema:Order ; st:adjacentTo ?finishedOrder .\r\n\r\n  {SELECT ?finishedOrder ?finishedStack {\r\n    ?finishedOrder a schema:Order ; schema:orderedItem ?item .\r\n    ?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder .\r\n\r\n    FILTER NOT EXISTS {\r\n      ?finishedOrder a schema:Order ; schema:orderedItem ?notFinished .\r\n      FILTER NOT EXISTS {?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder ; schema:orderedItem [ a ?notFinished ]}\r\n    }\r\n  }}\r\n} ;\r\n\r\n#### LOG CURRENT NUMBER OF OPEN stacks\r\nDELETE {  mosp:maxStackCount rdf:value  ?oldCount . }\r\nINSERT {  mosp:maxStackCount rdf:value  ?new . }\r\nWHERE {\r\n  {SELECT (count(?stack) as ?newCount) WHERE {\r\n      ?stack a mosp:Stack .\r\n  }}\r\n  OPTIONAL {mosp:maxStackCount rdf:value ?oldCount .}\r\n  BIND(IF(bound(?oldCount), ?oldCount, 0) as ?old)\r\n  BIND(IF(?newCount > ?old, ?newCount,?old) as ?new)\r\n} ;\r\n\r\n#### DELETE ORDERS AND THEIR STACKS WHEN FINISHED\r\nDELETE {\r\n  ?finishedStack a mosp:Stack; mosp:forOrder ?finishedOrder ; schema:orderedItem ?item .\r\n  ?item ?p ?o .\r\n  ?finishedOrder a schema:Order , st:Topos ; st:adjacentTo ?other ; st:carries ?trace ; schema:orderedItem ?itemClass.\r\n  ?trace a st:Trace ; ?t_p ?t_o .\r\n}\r\nWHERE {\r\n  ?finishedOrder a schema:Order , st:Topos ; st:carries ?trace ; schema:orderedItem ?itemClass .\r\n  ?trace a st:Trace ; ?t_p ?t_o .\r\n  FILTER(isblank(?trace))\r\n\r\n  ?finishedStack mosp:forOrder ?finishedOrder ; schema:orderedItem ?item .\r\n  ?item ?p ?o .\r\n  FILTER(isblank(?item))\r\n\r\n  {SELECT ?finishedOrder ?finishedStack {\r\n      ?finishedOrder a schema:Order ; schema:orderedItem ?item .\r\n      ?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder .\r\n\r\n      FILTER NOT EXISTS {\r\n        ?finishedOrder a schema:Order ; schema:orderedItem ?notFinished .\r\n        FILTER NOT EXISTS {?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder ; schema:orderedItem [ a ?notFinished ]}\r\n      }\r\n    }}\r\n} ;\r\n\r\n\r\n#### AGENT IS NOW MOST LIKELY IN NIRVANA. REMOVE HIS LOCALITY TO PICK A NEW\r\n#### RANDOM ORDER NEXT TIME\r\n\r\nDELETE {\r\n  mosp:Agent st:locatedAt ?at\r\n} WHERE {\r\n  mosp:Agent st:locatedAt ?at .\r\n  FILTER NOT EXISTS {\r\n    ?at a st:Topos .\r\n  }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Removes orders and stacks that have been completed"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Concentration-based Markers",
+			"item": [
+				{
+					"name": "Move agent to order with concentration",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/sparql-update"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n## If located at a Topos, agent will move to a neighbour order with highest concentration\r\n## of pheromones\r\n\r\nDELETE {\r\n  mosp:Agent st:locatedAt ?from\r\n}\r\nINSERT {\r\n  mosp:Agent st:locatedAt ?to\r\n}\r\nWHERE {\r\nmosp:Agent st:locatedAt ?from .\r\n{SELECT DISTINCT  ?to WHERE {\r\n\r\n  {SELECT DISTINCT ?to ?totalLevel WHERE {\r\n    mosp:Agent st:locatedAt ?from .\r\n    ?from st:adjacentTo ?to .\r\n    {SELECT DISTINCT ?to (sum(?level) as ?totalLevel) WHERE {\r\n        ?to st:carries ?marker . ?marker a st:Trace ; st:level ?level  .\r\n    } GROUP BY ?to }}}\r\n\r\n\r\n   {SELECT (min(?totalLevel) as ?min) WHERE {\r\n   {SELECT DISTINCT ?to (SUM(?level) as ?totalLevel) WHERE {\r\n        mosp:Agent st:locatedAt ?from .\r\n        ?from st:adjacentTo ?to .\r\n        ?to st:carries ?marker . ?marker a st:Trace ; st:level ?level .\r\n    } GROUP BY ?to }}}\r\n\r\n    FILTER EXISTS { ?st a mosp:Stack; mosp:forOrder ?to }\r\n    FILTER(?totalLevel = ?min)\r\n    } ORDER BY RAND() LIMIT 1}} ;\r\n\r\n\r\n## Send agent to order with lowest trace concentration, if traces present\r\n\r\nINSERT {\r\n   mosp:Agent st:locatedAt ?to\r\n}\r\nWHERE {\r\n    { SELECT ?to WHERE {\r\n      { SELECT DISTINCT ?to ?totalLevel WHERE {\r\n        ?to a schema:Order .\r\n        {SELECT DISTINCT ?to (sum(?level) as ?totalLevel) WHERE {\r\n          ?to st:carries ?marker . ?marker a st:Trace ; st:level ?level  .\r\n        } GROUP BY ?to }}}\r\n\r\n        {SELECT (min(?totalLevel) as ?min) WHERE {\r\n        {SELECT DISTINCT ?to (SUM(?level) as ?totalLevel) WHERE {\r\n          ?to a schema:Order .\r\n          ?to st:carries ?marker . ?marker a st:Trace ; st:level ?level .\r\n        } GROUP BY ?to }}}\r\n\r\n        FILTER(?min = ?totalLevel)\r\n    } ORDER BY RAND() LIMIT 1  }\r\n    FILTER NOT EXISTS { mosp:Agent st:locatedAt ?anywhere }\r\n} ;\r\n\r\n## Send agent to random order if not yet present anywhere\r\n\r\n\r\nINSERT {\r\n   mosp:Agent st:locatedAt ?randomOrder\r\n}\r\nWHERE {\r\n   {SELECT ?randomOrder WHERE  {\r\n    {SELECT (count(?item) as ?total) ?randomOrder WHERE {\r\n      ?randomOrder a schema:Order ; schema:orderedItem ?item .\r\n    } GROUP BY ?randomOrder }\r\n\r\n    {SELECT (min(?total) as ?min) WHERE {\r\n    {SELECT (count(?item) as ?total) ?randomOrder WHERE {\r\n      ?randomOrder a schema:Order ; schema:orderedItem ?item .\r\n    } GROUP BY ?randomOrder }}}\r\n    FILTER(?min = ?total)\r\n   } ORDER BY RAND() LIMIT 1}\r\n    FILTER NOT EXISTS { mosp:Agent st:locatedAt ?anywhere }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Moves the agent to an order. The first move is done random. After this, move will prefer orders with shared products and open stacks"
+					},
+					"response": []
+				},
+				{
+					"name": "Produce With Open Order Concentration",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/sparql-update"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n\r\nDELETE {\r\n  ?lastElement rdf:rest rdf:nil .\r\n  ?emptyList rdf:contents rdf:nil .\r\n\r\n  ?order st:carries ?existing .\r\n  ?existing a st:Trace ; st:level ?existingLevel .\r\n}\r\nINSERT {\r\n  ### Log produced product in order sequence\r\n  ?sequenceElement rdf:first ?producedClass ;\r\n                   rdf:rest rdf:nil .\r\n  ?lastElement rdf:rest ?sequenceElement .\r\n  ?emptyList rdf:contents ?sequenceElement .\r\n\r\n  ### Add Item to the stack\r\n  ?stack a mosp:Stack ; mosp:forOrder ?order ; schema:orderedItem ?item .\r\n  ?item a ?producedClass .\r\n\r\n  ## Add a pheromone marker to the order\r\n  ?marker a st:Trace ; st:level ?level.\r\n  ?order st:carries ?marker .\r\n}  WHERE {\r\n\r\n  OPTIONAL { ?emptyList rdf:contents rdf:nil . }\r\n  OPTIONAL { ?lastElement rdf:rest rdf:nil . }\r\n\r\n  BIND(BNODE() as ?sequenceElement)\r\n\r\n  ## Agent picks an item out of the order list at random\r\n  {SELECT ?producedClass ?at WHERE {\r\n    mosp:Agent st:locatedAt ?at .\r\n    ?at schema:orderedItem ?producedClass .\r\n    FILTER NOT EXISTS { ?stack a mosp:Stack ; schema:orderedItem [ a ?producedClass ]. }\r\n  } ORDER BY RAND() LIMIT 1}\r\n\r\n  ## Count number of remaining open products in the order\r\n  {SELECT (COUNT(?open) as ?level) (BNODE() as ?marker) ?order WHERE {\r\n    ?order a schema:Order ; schema:orderedItem ?open .\r\n    FILTER NOT EXISTS { ?stack a mosp:Stack; schema:orderedItem [ a ?open ] . }\r\n  } GROUP BY ?order}\r\n\r\n  ## Add the newly produced product to a stack; create new stack where necessary\r\n  {SELECT (BNODE() as ?item) (UUID() as ?stack) ?order ?producedClass WHERE {\r\n    ?order schema:orderedItem ?producedClass .\r\n    FILTER NOT EXISTS { ?stack a mosp:Stack ; mosp:forOrder ?order }\r\n  }\r\n  } UNION\r\n  {SELECT (BNODE() as ?item) ?stack ?order WHERE {\r\n    ?stack a mosp:Stack ; mosp:forOrder ?order .\r\n  }}\r\n\r\n  {SELECT ?order ?existing ?existingLevel WHERE {\r\n  ?order a schema:Order .\r\n  OPTIONAL {\r\n    ?order st:carries ?existing .\r\n    ?existing a st:Trace ; st:level ?existingLevel .\r\n    FILTER (isBlank(?existing))\r\n  }}}\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Selects a Random product from within the order that was not yet produced, and adds it to the stack of any order that requires that product. Puts a trace on any order that was served this way to attract the agent to open orders in the next steps"
+					},
+					"response": []
+				},
+				{
+					"name": "Close Orders",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/sparql-update",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "PREFIX sc: <http://purl.org/science/owl/sciencecommons/>\r\nprefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n\r\n#### DELETE ADJACENT RELATIONS\r\nDELETE {\r\n  ?other st:adjacentTo ?finishedOrder .\r\n  ?finishedOrder st:adjacentTo ?other .\r\n}\r\nWHERE {\r\n  ?finishedOrder a st:Topos , schema:Order ; st:adjacentTo ?other .\r\n  ?other a st:Topos, schema:Order ; st:adjacentTo ?finishedOrder .\r\n\r\n  {SELECT ?finishedOrder ?finishedStack {\r\n    ?finishedOrder a schema:Order ; schema:orderedItem ?item .\r\n    ?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder .\r\n\r\n    FILTER NOT EXISTS {\r\n      ?finishedOrder a schema:Order ; schema:orderedItem ?notFinished .\r\n      FILTER NOT EXISTS {?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder ; schema:orderedItem [ a ?notFinished ]}\r\n    }\r\n  }}\r\n} ;\r\n\r\n#### LOG CURRENT NUMBER OF OPEN stacks\r\nDELETE {  mosp:maxStackCount rdf:value  ?oldCount . }\r\nINSERT {  mosp:maxStackCount rdf:value  ?new . }\r\nWHERE {\r\n  {SELECT (count(?stack) as ?newCount) WHERE {\r\n      ?stack a mosp:Stack .\r\n  }}\r\n  OPTIONAL {mosp:maxStackCount rdf:value ?oldCount .}\r\n  BIND(IF(bound(?oldCount), ?oldCount, 0) as ?old)\r\n  BIND(IF(?newCount > ?old, ?newCount,?old) as ?new)\r\n} ;\r\n\r\n#### DELETE ORDERS AND THEIR STACKS WHEN FINISHED\r\nDELETE {\r\n  ?finishedStack a mosp:Stack; mosp:forOrder ?finishedOrder ; schema:orderedItem ?item .\r\n  ?item ?p ?o .\r\n  ?finishedOrder a schema:Order , st:Topos ; st:adjacentTo ?other ; st:carries ?trace ; schema:orderedItem ?itemClass.\r\n  ?trace a st:Trace ; ?t_p ?t_o .\r\n}\r\nWHERE {\r\n  ?finishedOrder a schema:Order , st:Topos ; st:carries ?trace ; schema:orderedItem ?itemClass .\r\n  ?trace a st:Trace ; ?t_p ?t_o .\r\n  FILTER(isblank(?trace))\r\n\r\n  ?finishedStack mosp:forOrder ?finishedOrder ; schema:orderedItem ?item .\r\n  ?item ?p ?o .\r\n  FILTER(isblank(?item))\r\n\r\n  {SELECT ?finishedOrder ?finishedStack {\r\n      ?finishedOrder a schema:Order ; schema:orderedItem ?item .\r\n      ?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder .\r\n\r\n      FILTER NOT EXISTS {\r\n        ?finishedOrder a schema:Order ; schema:orderedItem ?notFinished .\r\n        FILTER NOT EXISTS {?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder ; schema:orderedItem [ a ?notFinished ]}\r\n      }\r\n    }}\r\n} ;\r\n\r\n\r\n#### AGENT IS NOW MOST LIKELY IN NIRVANA. REMOVE HIS LOCALITY TO PICK A NEW\r\n#### RANDOM ORDER NEXT TIME\r\n\r\nDELETE {\r\n  mosp:Agent st:locatedAt ?at\r\n} WHERE {\r\n  mosp:Agent st:locatedAt ?at .\r\n  FILTER NOT EXISTS {\r\n    ?at a st:Topos .\r\n  }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Removes orders and stacks that have been completed"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Random Agent",
+			"item": [
+				{
+					"name": "Move agent to order",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/sparql-update",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n## If located at a Topos, agent will move to a neighbour order with highest concentration\r\n## of pheromones\r\n\r\nDELETE {\r\n  mosp:Agent st:locatedAt ?from\r\n}\r\nINSERT {\r\n  mosp:Agent st:locatedAt ?to\r\n}\r\nWHERE {\r\nmosp:Agent st:locatedAt ?from .\r\n{SELECT DISTINCT  ?to WHERE {\r\n    mosp:Agent st:locatedAt ?from .\r\n    ?from st:adjacentTo ?to .\r\n} ORDER BY RAND() LIMIT 1}} ;\r\n\r\n\r\n## Send agent to random order if not yet present anywhere\r\n\r\nINSERT {\r\n   mosp:Agent st:locatedAt ?randomOrder\r\n}\r\nWHERE {\r\n    {SELECT ?randomOrder WHERE {\r\n      ?randomOrder a schema:Order .\r\n    } ORDER BY RAND() LIMIT 1 }\r\n\r\n    FILTER NOT EXISTS { mosp:Agent st:locatedAt ?anywhere }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Moves the agent to an order. The first move is done random. After this, move will prefer orders with shared products and open stacks"
+					},
+					"response": []
+				},
+				{
+					"name": "Produce",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/sparql-update",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\nDELETE {\r\n  ?lastElement rdf:rest rdf:nil .\r\n  ?emptyList rdf:contents rdf:nil .\r\n}\r\nINSERT {\r\n\r\n  ### Log produced product in order sequence\r\n  ?sequenceElement rdf:first ?producedClass ;\r\n                   rdf:rest rdf:nil .\r\n  ?lastElement rdf:rest ?sequenceElement .\r\n  ?emptyList rdf:contents ?sequenceElement .\r\n\r\n  ### Add Item to the stack\r\n  ?stack a mosp:Stack ; mosp:forOrder ?order ; schema:orderedItem ?item .\r\n  ?item a ?producedClass .\r\n\r\n  ## Add a pheromone marker to the order\r\n  ?marker a st:Trace .\r\n  ?order st:carries ?marker .\r\n}  WHERE {\r\n\r\n  OPTIONAL { ?emptyList rdf:contents rdf:nil . }\r\n  OPTIONAL { ?lastElement rdf:rest rdf:nil . }\r\n\r\n  BIND(BNODE() as ?sequenceElement)\r\n\r\n  ## Agent picks an item out of the order list at random\r\n  {SELECT ?producedClass ?at WHERE {\r\n    mosp:Agent st:locatedAt ?at .\r\n    ?at schema:orderedItem ?producedClass .\r\n    FILTER NOT EXISTS { ?stack a mosp:Stack ; schema:orderedItem [ a ?producedClass ]. }\r\n  } ORDER BY RAND() LIMIT 1}\r\n\r\n  ## Find all orders that require the selected product\r\n  {SELECT DISTINCT (BNODE() as ?marker) ?order ?producedClass WHERE {\r\n    ?order schema:orderedItem ?producedClass .\r\n  }}\r\n\r\n  ## Add the newly produced product to a stack; create new stack where necessary\r\n  {SELECT (BNODE() as ?item) (UUID() as ?stack) ?order ?producedClass WHERE {\r\n    ?order schema:orderedItem ?producedClass .\r\n    FILTER NOT EXISTS { ?stack a mosp:Stack ; mosp:forOrder ?order }\r\n  }\r\n  } UNION\r\n  {SELECT (BNODE() as ?item) ?stack ?order WHERE {\r\n    ?stack a mosp:Stack ; mosp:forOrder ?order .\r\n  }}\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Selects a Random product from within the order that was not yet produced, and adds it to the stack of any order that requires that product. Puts a trace on any order that was served this way to attract the agent to open orders in the next steps"
+					},
+					"response": []
+				},
+				{
+					"name": "Close Orders",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/sparql-update",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "PREFIX sc: <http://purl.org/science/owl/sciencecommons/>\r\nprefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\nprefix mosp: <http://dfki.de/examples/stig_mosp#>\r\nprefix ord: <http://dfki.de/examples/stig_mosp/orders#>\r\nprefix st: <http://dfki.de/stigld/>\r\nprefix schema: <http://schema.org/>\r\n\r\n\r\n#### DELETE ADJACENT RELATIONS\r\nDELETE {\r\n  ?other st:adjacentTo ?finishedOrder .\r\n  ?finishedOrder st:adjacentTo ?other .\r\n}\r\nWHERE {\r\n  ?finishedOrder a st:Topos , schema:Order ; st:adjacentTo ?other .\r\n  ?other a st:Topos, schema:Order ; st:adjacentTo ?finishedOrder .\r\n\r\n  {SELECT ?finishedOrder ?finishedStack {\r\n    ?finishedOrder a schema:Order ; schema:orderedItem ?item .\r\n    ?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder .\r\n\r\n    FILTER NOT EXISTS {\r\n      ?finishedOrder a schema:Order ; schema:orderedItem ?notFinished .\r\n      FILTER NOT EXISTS {?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder ; schema:orderedItem [ a ?notFinished ]}\r\n    }\r\n  }}\r\n} ;\r\n\r\n#### LOG CURRENT NUMBER OF OPEN stacks\r\nDELETE {  mosp:maxStackCount rdf:value  ?oldCount . }\r\nINSERT {  mosp:maxStackCount rdf:value  ?new . }\r\nWHERE {\r\n  {SELECT (count(?stack) as ?newCount) WHERE {\r\n      ?stack a mosp:Stack .\r\n  }}\r\n  OPTIONAL {mosp:maxStackCount rdf:value ?oldCount .}\r\n  BIND(IF(bound(?oldCount), ?oldCount, 0) as ?old)\r\n  BIND(IF(?newCount > ?old, ?newCount,?old) as ?new)\r\n} ;\r\n\r\n#### DELETE ORDERS AND THEIR STACKS WHEN FINISHED\r\nDELETE {\r\n  ?finishedStack a mosp:Stack; mosp:forOrder ?finishedOrder ; schema:orderedItem ?item .\r\n  ?item ?p ?o .\r\n  ?finishedOrder a schema:Order , st:Topos ; st:adjacentTo ?other ; st:carries ?trace ; schema:orderedItem ?itemClass.\r\n  ?trace a st:Trace ; ?t_p ?t_o .\r\n}\r\nWHERE {\r\n  ?finishedOrder a schema:Order , st:Topos ; st:carries ?trace ; schema:orderedItem ?itemClass .\r\n  ?trace a st:Trace ; ?t_p ?t_o .\r\n  FILTER(isblank(?trace))\r\n\r\n  ?finishedStack mosp:forOrder ?finishedOrder ; schema:orderedItem ?item .\r\n  ?item ?p ?o .\r\n  FILTER(isblank(?item))\r\n\r\n  {SELECT ?finishedOrder ?finishedStack {\r\n      ?finishedOrder a schema:Order ; schema:orderedItem ?item .\r\n      ?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder .\r\n\r\n      FILTER NOT EXISTS {\r\n        ?finishedOrder a schema:Order ; schema:orderedItem ?notFinished .\r\n        FILTER NOT EXISTS {?finishedStack a mosp:Stack ; mosp:forOrder ?finishedOrder ; schema:orderedItem [ a ?notFinished ]}\r\n      }\r\n    }}\r\n} ;\r\n\r\n\r\n#### AGENT IS NOW MOST LIKELY IN NIRVANA. REMOVE HIS LOCALITY TO PICK A NEW\r\n#### RANDOM ORDER NEXT TIME\r\n\r\nDELETE {\r\n  mosp:Agent st:locatedAt ?at\r\n} WHERE {\r\n  mosp:Agent st:locatedAt ?at .\r\n  FILTER NOT EXISTS {\r\n    ?at a st:Topos .\r\n  }\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://localhost:3030/mosp/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3030",
+							"path": [
+								"mosp",
+								"update"
+							]
+						},
+						"description": "Removes orders and stacks that have been completed"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

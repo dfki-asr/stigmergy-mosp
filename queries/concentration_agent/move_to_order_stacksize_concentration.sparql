@@ -1,0 +1,82 @@
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix mosp: <http://dfki.de/examples/stig_mosp#>
+prefix ord: <http://dfki.de/examples/stig_mosp/orders#>
+prefix st: <http://dfki.de/stigld/>
+prefix schema: <http://schema.org/>
+
+## If located at a Topos, agent will move to a neighbour order with highest concentration
+## of pheromones
+
+DELETE {
+  mosp:Agent st:locatedAt ?from
+}
+INSERT {
+  mosp:Agent st:locatedAt ?to
+}
+WHERE {
+mosp:Agent st:locatedAt ?from .
+{SELECT DISTINCT  ?to WHERE {
+
+  {SELECT DISTINCT ?to ?totalLevel WHERE {
+    mosp:Agent st:locatedAt ?from .
+    ?from st:adjacentTo ?to .
+    {SELECT DISTINCT ?to (sum(?level) as ?totalLevel) WHERE {
+        ?to st:carries ?marker . ?marker a st:Trace ; st:level ?level  .
+    } GROUP BY ?to }}}
+
+
+   {SELECT (min(?totalLevel) as ?min) WHERE {
+   {SELECT DISTINCT ?to (SUM(?level) as ?totalLevel) WHERE {
+        mosp:Agent st:locatedAt ?from .
+        ?from st:adjacentTo ?to .
+        ?to st:carries ?marker . ?marker a st:Trace ; st:level ?level .
+    } GROUP BY ?to }}}
+
+    FILTER EXISTS { ?st a mosp:Stack; mosp:forOrder ?to }
+    FILTER(?totalLevel = ?min)
+    } ORDER BY RAND() LIMIT 1}} ;
+
+
+## Send agent to order with lowest trace concentration, if traces present
+
+INSERT {
+   mosp:Agent st:locatedAt ?to
+}
+WHERE {
+    { SELECT ?to WHERE {
+      { SELECT DISTINCT ?to ?totalLevel WHERE {
+        ?to a schema:Order .
+        {SELECT DISTINCT ?to (sum(?level) as ?totalLevel) WHERE {
+          ?to st:carries ?marker . ?marker a st:Trace ; st:level ?level  .
+        } GROUP BY ?to }}}
+
+        {SELECT (min(?totalLevel) as ?min) WHERE {
+        {SELECT DISTINCT ?to (SUM(?level) as ?totalLevel) WHERE {
+          ?to a schema:Order .
+          ?to st:carries ?marker . ?marker a st:Trace ; st:level ?level .
+        } GROUP BY ?to }}}
+
+        FILTER(?min = ?totalLevel)
+    } ORDER BY RAND() LIMIT 1  }
+    FILTER NOT EXISTS { mosp:Agent st:locatedAt ?anywhere }
+} ;
+
+## Send agent to random order if not yet present anywhere
+
+INSERT {
+   mosp:Agent st:locatedAt ?randomOrder
+}
+WHERE {
+   {SELECT ?randomOrder WHERE  {
+    {SELECT (count(?item) as ?total) ?randomOrder WHERE {
+      ?randomOrder a schema:Order ; schema:orderedItem ?item .
+    } GROUP BY ?randomOrder }
+
+    {SELECT (min(?total) as ?min) WHERE {
+    {SELECT (count(?item) as ?total) ?randomOrder WHERE {
+      ?randomOrder a schema:Order ; schema:orderedItem ?item .
+    } GROUP BY ?randomOrder }}}
+    FILTER(?min = ?total)
+   } ORDER BY RAND() LIMIT 1}
+    FILTER NOT EXISTS { mosp:Agent st:locatedAt ?anywhere }
+}
